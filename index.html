@@ -319,6 +319,37 @@
     line-height: 1.7;
   }
 
+  .insight p strong {
+    color: var(--text);
+  }
+
+  /* Caveat note */
+  .caveat {
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .caveat h4 {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+
+  .caveat p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .caveat p strong {
+    color: var(--text);
+  }
+
   /* Tools strip */
   .tools {
     text-align: center;
@@ -352,6 +383,13 @@
     margin: 0 0.1rem;
   }
 
+  .tools-note {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 0.9rem;
+    opacity: 0.8;
+  }
+
   /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
@@ -363,6 +401,7 @@
   .analogy { animation: fadeUp 0.6s ease 0.2s both; }
   .flow { animation: fadeUp 0.6s ease 0.3s both; }
   .insight { animation: fadeUp 0.6s ease 0.4s both; }
+  .caveat { animation: fadeUp 0.6s ease 0.45s both; }
   .tools { animation: fadeUp 0.6s ease 0.5s both; }
 
   @media (max-width: 700px) {
@@ -400,7 +439,7 @@
     <div class="analogy-icon">🏺</div>
     <div class="analogy-content">
       <h2>Think of it like sculpting clay</h2>
-      <p>Imagine you start with a lump of clay — all the raw material is already there, it just has no form yet. The model works it like a sculptor: <strong>removing some bits, smoothing others out, adding texture in places, gathering and moulding parts into shapes</strong>. Each pass over the clay brings it closer to the finished piece. Early passes are bold and structural — establishing the overall composition. Later passes are fine and delicate — refining edges, adding detail, perfecting surfaces. The model typically makes <strong>20 to 50 passes</strong> before presenting the final result.</p>
+      <p>Imagine you start with a lump of clay — all the raw material is already there, it just has no form yet. The model works it like a sculptor: <strong>removing some bits, smoothing others out, adding texture in places, gathering and moulding parts into shapes</strong>. Each pass over the clay brings it closer to the finished piece. Early passes are bold and structural — establishing the overall composition. Later passes are fine and delicate — refining edges, adding detail, perfecting surfaces. Traditionally a model made <strong>tens of passes</strong> before presenting the final result, often somewhere between 20 and 50. Newer streamlined versions have been trained to reach a similar result in <strong>a handful of passes</strong>, sometimes fewer than ten, which is a large part of why image generation has become so much faster.</p>
     </div>
   </div>
 
@@ -420,7 +459,7 @@
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step loop">
-        <div class="loop-badge">20-50×</div>
+        <div class="loop-badge">REPEATED</div>
         <div class="flow-step-icon">🔄</div>
         <div class="flow-step-title">Denoise Loop</div>
         <div class="flow-step-desc">Sculpt, refine,<br>repeat</div>
@@ -436,17 +475,24 @@
 
   <div class="insight">
     <h3>Why does this matter?</h3>
-    <p>In a diffusion model, the language-understanding component and the image-generating component are <strong>separate systems</strong> working together. The text encoder creates a plan, then hands it off to the denoising process. This is why diffusion models can sometimes misinterpret complex prompts — the translation step between words and image is an extra link in the chain where meaning can be lost.</p>
+    <p>In a diffusion model, the language-understanding component and the image-generating component are <strong>separate systems</strong> working together. The text encoder creates a plan, then hands it off to the denoising process. This is why diffusion models can sometimes misinterpret complex prompts — the translation step between words and image is an extra link in the chain where meaning can be lost. It is also why they tend to be weaker at rendering readable text inside an image, and stronger on texture, atmosphere and painterly style.</p>
+  </div>
+
+  <div class="caveat">
+    <h4>A note on "two methods"</h4>
+    <p>Diffusion and autoregressive generation are the two main families, but the line between them is blurring. Some current models appear to combine both — using one approach to rough out the image and the other to refine it. <strong>Not every company publishes what its model actually does.</strong> Google, for instance, has not said publicly how Nano Banana, the image generator inside Gemini, works. Treat these two pages as useful mental models rather than a filing system that every tool fits neatly into.</p>
   </div>
 
   <div class="tools">
     <div class="tools-label">Tools that use diffusion</div>
     <div class="tools-list">
-      <div class="tool-item">Gemini <span>(Imagen)</span></div>
+      <div class="tool-item">Imagen <span>(Google)</span></div>
       <div class="tool-item">Adobe Firefly</div>
       <div class="tool-item">Midjourney</div>
       <div class="tool-item">Stable Diffusion</div>
+      <div class="tool-item">FLUX</div>
     </div>
+    <p class="tools-note">Imagen is reachable through Gemini, ImageFX and Vertex AI. The Gemini app's own default image generator, Nano Banana, is a separate model and Google has not published its architecture.</p>
   </div>
 </div>
 
@@ -454,10 +500,10 @@
 // Generate progressive denoising visualisation on canvases
 const stageData = [
   { label: 'Pure Noise', step: 'Step 0', noise: 1.0 },
-  { label: 'Rough Forms', step: 'Step ~10', noise: 0.72 },
-  { label: 'Shapes Emerge', step: 'Step ~20', noise: 0.45 },
-  { label: 'Detail Builds', step: 'Step ~35', noise: 0.18 },
-  { label: 'Final Image', step: 'Step ~50', noise: 0.0 },
+  { label: 'Rough Forms', step: 'Early pass', noise: 0.72 },
+  { label: 'Shapes Emerge', step: 'Middle pass', noise: 0.45 },
+  { label: 'Detail Builds', step: 'Late pass', noise: 0.18 },
+  { label: 'Final Image', step: 'Complete', noise: 0.0 },
 ];
 
 // We'll draw a simple "landscape" that progressively resolves
